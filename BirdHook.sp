@@ -1,16 +1,15 @@
-#include <sourcemod>
 #include <sdktools>
 #include <sdkhooks>
 #pragma semicolon 1
 
-new Float:Vec1[3];
-new Float:Yaw1;
-new Float:YawRate1;
-new Float:Something1;
-new Float:Speed1;
-new Float:Time1;
+float Vec1[3];
+float Yaw1;
+float YawRate1;
+float Something1;
+float Speed1;
+float Time1;
 
-public OnPluginStart() 
+public void OnPluginStart() 
 {
 	HookUserMessage(GetUserMessageId("SpawnFlyingBird"), HookFade, true);
 	
@@ -18,7 +17,7 @@ public OnPluginStart()
 	RegConsoleCmd("sm_burd2", Command_Burd2);
 }
 
-public Action:HookFade(UserMsg:msg_id, Handle:bf, const players[], playersNum, bool:reliable, bool:init) 
+public Action HookFade(UserMsg msg_id, Handle bf, const players[], int playersNum, bool reliable, bool init) 
 {
 	BfReadVecCoord(bf, Vec1);
 	Yaw1 = BfReadFloat(bf);
@@ -30,16 +29,16 @@ public Action:HookFade(UserMsg:msg_id, Handle:bf, const players[], playersNum, b
 	PrintToServer("Vec: {%f, %f, %f} Yaw: %f YawRate: %f Something: %f Speed: %f Time %f", Vec1[0], Vec1[1], Vec1[2], Yaw1, YawRate1, Something1, Speed1, Time1);
 }
 
-public Action:Command_Burd(client, args)
+public Action Command_Burd(int client, int args)
 {
 	SpawnFlyingBird(Vec1, Yaw1, YawRate1, Something1, Speed1, Time1);
 	
 	return Plugin_Handled;
 }
 
-public Action:Command_Burd2(client, args)
+public Action Command_Burd2(int client, int args)
 {
-	new Float:vec[3];
+	float vec[3];
 	GetClientAbsOrigin(client, vec);
 	vec[2] += 5.0;
 	SpawnFlyingBirdRandom(vec);
@@ -47,9 +46,9 @@ public Action:Command_Burd2(client, args)
 	return Plugin_Handled;
 }
 
-stock SpawnFlyingBird(Float:vec[3], Float:Yaw, Float:YawRate, Float:Something, Float:Speed, Float:Time)
+stock SpawnFlyingBird(float vec[3], float Yaw, float YawRate, float Something, float Speed, float Time)
 {
-	new Handle:message = StartMessageAll("SpawnFlyingBird");
+	Handle message = StartMessageAll("SpawnFlyingBird");
 	BfWriteVecCoord(message, Vec1);
 	BfWriteFloat(message, Yaw1);		//yaw
 	BfWriteFloat(message, YawRate1);	//yaw rate
@@ -59,14 +58,14 @@ stock SpawnFlyingBird(Float:vec[3], Float:Yaw, Float:YawRate, Float:Something, F
 	EndMessage();
 }
 
-stock SpawnFlyingBirdRandom(Float:vec[3])
+stock SpawnFlyingBirdRandom(float vec[3])
 {
-	new Handle:message = StartMessageAll("SpawnFlyingBird");
+	Handle message = StartMessageAll("SpawnFlyingBird");
 	BfWriteVecCoord(message, vec);
-	BfWriteFloat(message, GetRandomFloat(-3.0, 3.0));			//yaw
-	BfWriteFloat(message, GetRandomFloat(-1.0, 1.0));			//yaw rate
+	BfWriteFloat(message, GetRandomFloat(-FLOAT_PI, FLOAT_PI));			//yaw
+	BfWriteFloat(message, GetRandomFloat(-1.5, 1.5));			//yaw rate
 	BfWriteFloat(message, GetRandomFloat(0.5, 2.0));			//Curve up rate
-	BfWriteFloat(message, GetRandomFloat(300.0, 500.0));		//speed
-	BfWriteFloat(message, GetRandomFloat(0.0, 1.0));			//time til starts flapping
+	BfWriteFloat(message, GetRandomFloat(200.0, 500.0));		//speed
+	BfWriteFloat(message, GetRandomFloat(0.25, 1.0));			//time til starts flapping
 	EndMessage();
 }
